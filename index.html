@@ -55,16 +55,23 @@
             height: 250px;
             border-radius: 250px;
             background-size: 100% 100%;
-            transition: transform 0.5s ease;
             z-index: 10;
             border: 3px solid #fff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             position: relative;
             background-color: #666; /* 默认背景色 */
         }
+
+        /* 修改动画类，改为可以暂停的动画 */
         .record-img.playing {
             animation: rotate 20s linear infinite;
+            animation-play-state: running;
         }
+
+        .record-img.paused {
+            animation-play-state: paused;
+        }
+
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -342,6 +349,59 @@
             border-left: 3px solid #ff2a70;
         }
 
+        /* MV提示框样式 */
+        .mv-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            border: 2px solid rgba(255, 42, 112, 0.5);
+            box-shadow: 0 0 30px rgba(255, 42, 112, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .mv-notification.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .mv-notification h3 {
+            margin-top: 0;
+            color: #ff7eb3;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .mv-notification p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .mv-notification-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
         /* 响应式设计 */
         @media (max-width: 1200px) {
             .record-bg {
@@ -359,6 +419,11 @@
             }
             .author-container {
                 font-size: 1.5rem;
+            }
+            .mv-notification {
+                padding: 20px 30px;
+                width: 80%;
+                max-width: 400px;
             }
         }
 
@@ -382,6 +447,12 @@
             }
             .author-container {
                 font-size: 1.2rem;
+            }
+            .mv-notification h3 {
+                font-size: 1.5rem;
+            }
+            .mv-notification p {
+                font-size: 1.1rem;
             }
         }
 
@@ -407,6 +478,19 @@
             }
             .time-container, .right-button {
                 margin: 10px 0;
+            }
+            .mv-notification {
+                padding: 15px 20px;
+                width: 90%;
+            }
+            .mv-notification h3 {
+                font-size: 1.3rem;
+            }
+            .mv-notification p {
+                font-size: 1rem;
+            }
+            .mv-notification-icon {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -484,60 +568,68 @@
         </div>
     </div>
 
+    <!-- MV提示框 -->
+    <div class="mv-notification" id="mvNotification">
+        <div class="mv-notification-icon">🎬</div>
+        <h3>暂无MV</h3>
+        <p>当前歌曲暂时没有MV资源</p>
+        <p>请欣赏音频版本</p>
+    </div>
+
     <script>
         // 音乐数据 - 包含歌曲信息
         const musicList = [
             {
-                title: "跑刀小曲",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 跑刀小曲 (哈基米)_L (V0).mp3",
                 cover: "./2.png"
             },
             {
-                title: "蓝莲哈",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米 - 蓝莲哈（哈基米喔南北绿豆）_L (V0).mp3",
                 cover: "./1.png"
             },
             {
-                title: "再哈的身边",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 再哈的身边 (哈基米)_L (V0).mp3",
                 cover: "./3.png"
             },
             {
-                title: "最后一哈",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 最后一哈 (哈基米)_L (V0).mp3",
                 cover: "./4.png"
             },
             {
-                title: "死别",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米 - 死别 (哈基米版)_L (V0).mp3",
                 cover: "./5.png"
             },
             {
-                title: "哈基米起床歌",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 狂哈 (哈基米起床)_L (V0).mp3",
                 cover: "./6.png"
             },
             {
-                title: "不得不哈",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 不得不哈(哈基米)_L (V0).mp3",
                 cover: "./7.png"
             },
             {
-                title: "基米说",
-                artist: "哈基米",
+               title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米_ - 基米说 (哈基米)_L (V0).mp3",
                 cover: "./8.png"
             },
             {
-                title: "NO基米",
-                artist: "哈基米",
+                title: "25216950113",
+                artist: "陈泳聪",
                 src: "./哈基米 - No基米_L (V0).mp3",
                 cover: "./9.png"
             },
@@ -579,15 +671,23 @@
         const audioTime = document.querySelector('.audio-time');
         const speedBtn = document.querySelector('.speed');
         const listBtn = document.querySelector('.list');
+        const mvBtn = document.querySelector('.MV');
         const playlist = document.querySelector('.playlist');
         const playlistItems = document.querySelector('.playlist-items');
         const closePlaylistBtn = document.querySelector('.close-playlist');
+        const mvNotification = document.getElementById('mvNotification');
         const body = document.querySelector('body');
         const rippleContainer = document.getElementById('rippleContainer');
 
         // 初始化播放器
         function initPlayer() {
             loadMusic(currentMusicIndex);
+            
+            // 确保初始状态
+            recordImg.classList.add('playing');
+            if (!isPlaying) {
+                recordImg.classList.add('paused');
+            }
             
             // 事件监听器设置
             playPauseBtn.addEventListener('click', togglePlayPause);
@@ -599,6 +699,14 @@
             speedBtn.addEventListener('click', changePlaybackRate);
             listBtn.addEventListener('click', togglePlaylist);
             closePlaylistBtn.addEventListener('click', togglePlaylist);
+            mvBtn.addEventListener('click', showMVNotification);
+            
+            // 点击提示框背景关闭
+            mvNotification.addEventListener('click', function(e) {
+                if (e.target === mvNotification) {
+                    hideMVNotification();
+                }
+            });
             
             // 进度条事件
             progressContainer.addEventListener('click', seek);
@@ -620,6 +728,21 @@
             
             // 开始波纹动画
             animateRipples();
+        }
+
+        // 显示MV提示
+        function showMVNotification() {
+            mvNotification.classList.add('show');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                hideMVNotification();
+            }, 3000);
+        }
+
+        // 隐藏MV提示
+        function hideMVNotification() {
+            mvNotification.classList.remove('show');
         }
 
         // 初始化Web Audio API
@@ -775,8 +898,13 @@
             
             body.style.backgroundImage = `url('${music.cover}')`;
             
+            // 确保唱片有playing类，如果正在播放就运行，否则暂停
+            recordImg.classList.add('playing');
             if (isPlaying) {
+                recordImg.classList.remove('paused');
                 audioElement.play();
+            } else {
+                recordImg.classList.add('paused');
             }
         }
 
@@ -787,10 +915,13 @@
             }
             
             if (isPlaying) {
+                // 暂停播放
                 audioElement.pause();
                 playPauseBtn.classList.remove('paused');
-                recordImg.classList.remove('playing');
+                // 只添加paused类来暂停动画，不移除playing类
+                recordImg.classList.add('paused');
             } else {
+                // 开始播放
                 if (audioContext && audioContext.state === 'suspended') {
                     audioContext.resume();
                 }
@@ -799,7 +930,12 @@
                     console.error('播放失败:', error);
                 });
                 playPauseBtn.classList.add('paused');
-                recordImg.classList.add('playing');
+                // 移除paused类来继续动画
+                recordImg.classList.remove('paused');
+                // 确保有playing类（可能已经在加载音乐时添加）
+                if (!recordImg.classList.contains('playing')) {
+                    recordImg.classList.add('playing');
+                }
             }
             isPlaying = !isPlaying;
         }
@@ -808,9 +944,6 @@
         function playPrevious() {
             currentMusicIndex = (currentMusicIndex - 1 + musicList.length) % musicList.length;
             loadMusic(currentMusicIndex);
-            if (isPlaying) {
-                audioElement.play();
-            }
         }
 
         // 播放下一首
@@ -821,9 +954,6 @@
                 currentMusicIndex = (currentMusicIndex + 1) % musicList.length;
             }
             loadMusic(currentMusicIndex);
-            if (isPlaying) {
-                audioElement.play();
-            }
         }
 
         // 切换播放模式
